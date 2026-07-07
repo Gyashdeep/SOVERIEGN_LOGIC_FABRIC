@@ -1,5 +1,6 @@
 # Sovereign-Logic Fabric Dependencies
 # Core Architecture
+streamlit
 python-dotenv>=1.0.0
 # For advanced mathematical validation if integrating numpy-based physics engines
 numpy>=1.26.0
