@@ -1,0 +1,8 @@
+# Sovereign-Logic Fabric Dependencies
+# Core Architecture
+python-dotenv>=1.0.0
+# For advanced mathematical validation if integrating numpy-based physics engines
+numpy>=1.26.0
+# For secure logging if moving to database-backed ledgers
+psycopg2-binary>=2.9.9
+# Standard library used (Hashlib, Datetime, Threading are built-in)
