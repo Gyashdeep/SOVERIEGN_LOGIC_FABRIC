@@ -1,46 +1,53 @@
 import streamlit as st
 import time
-import threading
 from main import SLF_Core
 
-@st.cache_resource
-def get_fabric():
-    fabric = SLF_Core()
-    def background_loop():
-        while True:
-            fabric.execute_tick()
-            time.sleep(1)
-    threading.Thread(target=background_loop, daemon=True).start()
-    return fabric
+# Configuration for a "Terminal" look
+st.set_page_config(page_title="S.L.F. // CORE", layout="wide")
 
-fabric = get_fabric()
+# Custom CSS for that 0.0000000000001% aesthetic
+st.markdown("""
+    <style>
+    .main {background-color: #000000; color: #00FF41; font-family: 'Courier New', monospace;}
+    .stMetric {border: 1px solid #00FF41; padding: 15px; border-radius: 0px;}
+    h1 {color: #00FF41; text-shadow: 0 0 10px #00FF41;}
+    code {background-color: #1a1a1a !important; color: #00FF41 !important;}
+    </style>
+""", unsafe_allow_html=True)
 
-st.set_page_config(page_title="S.L.F. CONTROL", layout="wide")
-st.title("🌐 SOVEREIGN-LOGIC FABRIC // LIVE COMMAND")
+# State initialization
+if 'fabric' not in st.session_state:
+    st.session_state.fabric = SLF_Core()
 
-col1, col2 = st.columns(2)
+st.title(">> S.L.F. // AUTONOMOUS OPERATING SYSTEM")
+
+col1, col2 = st.columns([1, 1])
 
 with col1:
-    with fabric.lock: # Ensure thread-safe read
-        current_temp = fabric.state['temp']
-        logs = fabric.ledger.chain[-10:]
+    st.subheader("PHYSICAL TELEMETRY")
+    temp = st.session_state.fabric.state['temp']
+    st.metric("CORE TEMP", f"{temp} C")
     
-    st.metric("CORE TEMPERATURE", f"{current_temp}°C")
-    st.write("### AUDIT LOG")
+    st.write("### LIVE AUDIT STREAM")
+    # Display the ledger as a retro terminal feed
+    logs = st.session_state.fabric.ledger.chain[-15:]
     for entry in reversed(logs):
-        st.code(entry['entry'], language='text')
+        st.code(f"> {entry['entry']}", language='text')
 
 with col2:
-    with fabric.lock:
-        last_sig = fabric.ledger.chain[-1]['sig']
+    st.subheader("GOVERNANCE LAYER")
+    last_sig = st.session_state.fabric.ledger.chain[-1]['sig']
+    st.text(f"CRYPTO_SIGNATURE:\n{last_sig}")
     
-    st.write("### INTEGRITY VERIFICATION")
-    st.info(f"BLOCK SIGNATURE: {last_sig[:24]}...")
+    # Visual "Heartbeat" of the engine
+    progress = min(temp / 500, 1.0)
+    st.progress(progress)
     
-    if current_temp >= 500:
-        st.error("SAFETY SYSTEM ENGAGED: THERMAL LIMIT REACHED")
+    if temp >= 500:
+        st.error("!!! THERMAL CRITICAL // PHYSICS GOVERNANCE ACTIVE !!!")
     else:
-        st.success("SYSTEM OPERATING WITHIN PHYSICAL PARAMETERS")
+        st.success("SYSTEM INTEGRITY: NOMINAL")
 
+# Force loop refresh
 time.sleep(1)
 st.rerun()
